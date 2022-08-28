@@ -11,6 +11,7 @@ import java.util.function.Predicate;
 public class UserDaoService {
 
     private static List<User> users = new ArrayList<>();
+    private static Integer usersCount = 1;
 
     public List<User> findAll(){
         return users;
@@ -21,10 +22,16 @@ public class UserDaoService {
         return users.stream().filter(predicate).findFirst().get();
     }
 
+    public User save(User user){
+        user.setId(usersCount++);
+        users.add(user);
+        return user;
+    }
+
     static {
-        users.add(new User(1, "Ivan", LocalDate.of(2001, 6, 27)));
-        users.add(new User(2, "João Victor", LocalDate.of(2009, 5, 21)));
-        users.add(new User(3, "João Paulo", LocalDate.of(2013, 6, 30)));
+        users.add(new User(usersCount++, "Ivan", LocalDate.of(2001, 6, 27)));
+        users.add(new User(usersCount++, "João Victor", LocalDate.of(2009, 5, 21)));
+        users.add(new User(usersCount++, "João Paulo", LocalDate.of(2013, 6, 30)));
     }
 
 }
