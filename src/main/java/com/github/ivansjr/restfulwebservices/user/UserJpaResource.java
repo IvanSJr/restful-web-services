@@ -39,10 +39,8 @@ public class UserJpaResource {
 
     @GetMapping(value = "/jpa/users/{id}")
     public EntityModel<User> retrieveUser(@PathVariable Integer id){
-        Optional<User> user = repository.findById(id);
-        if (user.isEmpty())
-            throw new UserNotFoundException("id: "+id);
-        EntityModel<User> entityModel = EntityModel.of(user.get());
+        User user = checkIfUserExists(id);
+        EntityModel<User> entityModel = EntityModel.of(user);
         WebMvcLinkBuilder link = linkTo(methodOn(this.getClass()).retrieveAllUsers());
         entityModel.add(link.withRel("all-users"));
         return entityModel;
@@ -62,6 +60,19 @@ public class UserJpaResource {
                 .buildAndExpand(userSaved.getId())
                 .toUri();
         return ResponseEntity.created(location).build();
+    }
+
+    @GetMapping(value = "/jpa/users/{id}/posts")
+    public List<Post> retrievePostsUser(@PathVariable Integer id){
+        User user = checkIfUserExists(id);
+        return user.getPosts();
+    }
+
+    private User checkIfUserExists(Integer id) {
+        Optional<User> user = repository.findById(id);
+        if (user.isEmpty())
+            throw new UserNotFoundException("id: "+ id);
+        return user.get();
     }
 
 }
