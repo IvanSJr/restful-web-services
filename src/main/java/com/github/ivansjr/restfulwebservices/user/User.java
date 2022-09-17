@@ -1,13 +1,20 @@
 package com.github.ivansjr.restfulwebservices.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
+@Entity(name = "user_details")
 public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Size(min = 2, message = "O nome não pode ser menor que 2 caracteres")
     @JsonProperty("user_name")
@@ -15,6 +22,9 @@ public class User {
     @Past(message = "A data de nascimento não pode ser no futuro")
     @JsonProperty("birth_date")
     private LocalDate birthDate;
+
+    public User() {
+    }
 
     public User(Integer id, String name, LocalDate birthDate) {
         this.id = id;
