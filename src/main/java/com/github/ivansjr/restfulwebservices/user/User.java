@@ -17,10 +17,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Size(min = 2, message = "O nome não pode ser menor que 2 caracteres")
-    @JsonProperty("user_name")
+    // @JsonProperty("user_name")
     private String name;
     @Past(message = "A data de nascimento não pode ser no futuro")
-    @JsonProperty("birth_date")
+    // @JsonProperty("birth_date")
     private LocalDate birthDate;
 
     public User() {
