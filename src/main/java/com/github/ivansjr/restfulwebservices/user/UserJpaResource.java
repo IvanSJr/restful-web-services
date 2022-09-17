@@ -1,5 +1,6 @@
 package com.github.ivansjr.restfulwebservices.user;
 
+import com.github.ivansjr.restfulwebservices.jpa.PostRepository;
 import com.github.ivansjr.restfulwebservices.jpa.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +31,14 @@ public class UserJpaResource {
     private UserDaoService service;
 
     @Autowired
-    private UserRepository repository;
+    private UserRepository userRepository;
+
+    @Autowired
+    private PostRepository postRepository;
 
     @GetMapping(value = "/jpa/users")
     public List<User> retrieveAllUsers(){
-        return repository.findAll();
+        return userRepository.findAll();
     }
 
     @GetMapping(value = "/jpa/users/{id}")
@@ -49,12 +53,12 @@ public class UserJpaResource {
     @DeleteMapping(value = "/jpa/users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Integer id){
-        repository.deleteById(id);
+        userRepository.deleteById(id);
     }
 
     @PostMapping(value = "/jpa/users")
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-        User userSaved = repository.save(user);
+        User userSaved = userRepository.save(user);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(userSaved.getId())
@@ -63,13 +67,25 @@ public class UserJpaResource {
     }
 
     @GetMapping(value = "/jpa/users/{id}/posts")
-    public List<Post> retrievePostsUser(@PathVariable Integer id){
+    public List<Post> retrievePostsUser(@PathVariable Integer id) {
         User user = checkIfUserExists(id);
         return user.getPosts();
     }
 
+    @PostMapping(value = "jpa/users/{id}/posts")
+    public ResponseEntity<Object> createPostForUser(@PathVariable Integer id, @Valid @RequestBody Post post) {
+        User user = checkIfUserExists(id);
+        post.setUser(user);
+        Post postSaved = postRepository.save(post);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(postSaved.getId())
+                .toUri();
+        return ResponseEntity.created(location).build();
+    }
+
     private User checkIfUserExists(Integer id) {
-        Optional<User> user = repository.findById(id);
+        Optional<User> user = userRepository.findById(id);
         if (user.isEmpty())
             throw new UserNotFoundException("id: "+ id);
         return user.get();
